@@ -28,7 +28,7 @@ services:
     container_name: "nginx_test"
     # ポートフォワードの指定（ホスト側ポート：コンテナ側ポート）
     ports:
-      - 8081:80
+      - 80:80
     # ボリュームを設定する（ホスト側ディレクトリ:コンテナ側ボリュームの場所）
     volumes:
       - ./src:/var/www
