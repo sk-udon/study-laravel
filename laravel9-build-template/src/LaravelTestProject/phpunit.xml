@@ -27,5 +27,8 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- DB_CONNECTIONの設定 -->
+        <env name="DB_CONNECTION" value="sqlite_testing"/>
+        <env name="APP_ENV" value="testing"/>
     </php>
 </phpunit>

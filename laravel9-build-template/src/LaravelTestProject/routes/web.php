@@ -23,3 +23,7 @@ Route::get("/folders/{id}/tasks", [TaskController::class, "index"])->name("tasks
 //新規登録ページ
 Route::get("/folders/create", [FolderController::class, "showCreateForm"])->name("folders.create");
 Route::post("/folders/create", [FolderController::class, "create"]);
+
+//タスクの新規登録ページ
+Route::get("/folders/{id}/tasks/create", [TaskController::class, "showCreateForm"])->name("tasks.create");
+Route::post("/folders/{id}/tasks/create", [TaskController::class, "create"]);
