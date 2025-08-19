@@ -35,8 +35,8 @@
                                             {{ $folder->title }}
                                         </a>
                                     </td>
-                                    <td><a href="#">編集</a></td>
-                                    <td><a href="#">削除</a></td>
+                                    <td><a href="{{ route('folders.edit', ['id' => $folder->id])}}">編集</a></td>
+                                    <td><a href="{{ route('folders.delete', ['id' => $folder->id]) }}">削除</a></td>
                                 </tr>
                                 @endforeach
                             </table>
@@ -71,8 +71,8 @@
                                         <span class="label {{ $task->status_class }}">{{ $task->status_label }}</span>
                                     </td>
                                     <td>{{ $task->formatted_due_date }}</td>
-                                    <td><a href="#">編集</a></td>
-                                    <td><a href="#">削除</a></td>
+                                    <td><a href="{{ route('tasks.edit', ['id' => $folder_id, 'task_id' => $task->id]) }}">編集</a></td>
+                                    <td><a href="{{ route('tasks.delete', ['id' => $folder_id, 'task_id' => $task->id]) }}">削除</a></td>
                                 </tr>
                                 @endforeach
                             </tbody>
