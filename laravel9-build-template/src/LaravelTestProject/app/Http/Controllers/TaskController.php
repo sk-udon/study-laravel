@@ -7,6 +7,7 @@ use App\Models\Folder;
 use App\Models\Task;
 use App\Http\Requests\CreateTask;
 use App\Http\Requests\EditTask;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -46,10 +47,14 @@ class TaskController extends Controller
 
     public function showCreateForm(int $id)
     {
+            /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
+
         return view(
             'tasks.create',
             [
-                'folder_id' => $id,
+                'folder_id' => $folder->id,
             ]
         );
     }
@@ -65,7 +70,9 @@ class TaskController extends Controller
 
     public function create(int $id, CreateTask $request)
     {
-        $folder = Folder::find($id);
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
 
         $task = new Task();
         $task->title = $request->title;
@@ -88,7 +95,12 @@ class TaskController extends Controller
      */
 
     public function showEditForm(int $id, int $task_id){
-        $task = Task::find($task_id);
+
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
+
+        $task = $folder->tasks()->find($task_id);
 
         return view('tasks.edit', [
             'task' => $task,
@@ -108,7 +120,12 @@ class TaskController extends Controller
 
     public function edit(int $id, int $task_id, EditTask $request)
     {
-        $task = Task::find($task_id);
+
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
+
+        $task = $folder->tasks()->find($task_id);
 
         $task->title = $request->title;
         $task->status = $request->status;
@@ -130,7 +147,11 @@ class TaskController extends Controller
      */
     public function showDeleteForm(int $id, int $task_id)
     {
-        $task = Task::find($task_id);
+
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
+        $task = $folder->tasks()->findOrFail($task_id);
 
         return view('tasks.delete', [
             'task' => $task,
@@ -148,11 +169,16 @@ class TaskController extends Controller
      */
     public function delete(int $id, int $task_id)
     {
-        $task = Task::find($task_id);
+
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folder = $user->folders()->findOrFail($id);
+        $task = $folder->tasks()->findOrFail($task_id);
+
         $task->delete();
 
         return redirect()->route('tasks.index', [
-            'id' => $id
+            'id' => $task->folder_id
         ]);
     }
 }

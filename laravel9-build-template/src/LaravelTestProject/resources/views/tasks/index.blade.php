@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
+@extends('layout')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ToDo App</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
+@section('styles')
+    @include('share.flatpickr.styles')
+@endsection
 
-<body>
-    <header>
-        <nav class="my-navbar">
-            <a class="my-navbar-brand" href="/">ToDo App</a>
-        </nav>
-    </header>
-    <main>
+@section('content')
         <div class="container">
             <div class="row">
                 <div class="col col-md-4">
@@ -29,15 +18,17 @@
                         <div class="list-group">
                             <table class="table foler-table">
                                 @foreach($folders as $folder)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('tasks.index', ['id' => $folder->id]) }}" class="list-group-item {{ $folder_id === $folder->id ? 'active' : '' }}">
-                                            {{ $folder->title }}
-                                        </a>
-                                    </td>
-                                    <td><a href="{{ route('folders.edit', ['id' => $folder->id])}}">編集</a></td>
-                                    <td><a href="{{ route('folders.delete', ['id' => $folder->id]) }}">削除</a></td>
-                                </tr>
+                                    @if($folder->user_id === Auth::user()->id)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ route('tasks.index', ['id' => $folder->id]) }}" class="list-group-item {{ $folder_id === $folder->id ? 'active' : '' }}">
+                                                    {{ $folder->title }}
+                                                </a>
+                                            </td>
+                                            <td><a href="{{ route('folders.edit', ['id' => $folder->id])}}">編集</a></td>
+                                            <td><a href="{{ route('folders.delete', ['id' => $folder->id]) }}">削除</a></td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </table>
                         </div>
@@ -81,7 +72,8 @@
                 </div>
             </div>
         </div>
-    </main>
-</body>
+@endsection
 
-</html>
+@section('scripts')
+  @include('share.flatpickr.scripts')
+@endsection
