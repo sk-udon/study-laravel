@@ -14,16 +14,16 @@ class TaskController extends Controller
     /**
      *  【タスク一覧ページの表示機能】
      *
-     *  GET /folders/{id}/tasks
-     *  @param int $id
+     *  GET /folders/{folder}/tasks
+     *  @param Folder $folder
      *  @return \Illuminate\View\View
      */
 
-    public function index(int $id)
+    public function index(Folder $folder)
     {
-        $folders = Folder::all();
-
-        $folder = Folder::find($id);
+        /** @var App\Models\User **/
+        $user = Auth::user();
+        $folders = $user->folders()->get();
 
         $tasks = $folder->tasks()->get();
 
@@ -31,7 +31,7 @@ class TaskController extends Controller
             'tasks.index',
             [
                 'folders' => $folders,
-                'folder_id' => $id,
+                'folder_id' => $folder->id,
                 'tasks' => $tasks,
             ]
         );
@@ -40,16 +40,16 @@ class TaskController extends Controller
     /**
      *  【タスク作成ページの表示機能】
      *
-     *  GET /folders/{id}/tasks/create
-     *  @param int $id
+     *  GET /folders/{folder}/tasks/create
+     *  @param Folder $folder
      *  @return \Illuminate\View\View
      */
 
-    public function showCreateForm(int $id)
+    public function showCreateForm(Folder $folder)
     {
             /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
+        $folder = $user->folders()->findOrFail($folder->id);
 
         return view(
             'tasks.create',
@@ -62,17 +62,17 @@ class TaskController extends Controller
     /**
      *  【タスクの作成機能】
      *
-     *  POST /folders/{id}/tasks/create
-     *  @param int $id
+     *  POST /folders/{folder}/tasks/create
+     *  @param Folder $folder
      *  @param CreateTask $request
      *  @return \Illuminate\Http\RedirectResponse
      */
 
-    public function create(int $id, CreateTask $request)
+    public function create(Folder $folder, CreateTask $request)
     {
         /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
+        $folder = $user->folders()->findOrFail($folder->id);
 
         $task = new Task();
         $task->title = $request->title;
@@ -80,7 +80,7 @@ class TaskController extends Controller
         $folder->tasks()->save($task);
 
         return redirect()->route('tasks.index', [
-            'id' => $folder->id
+            'folder' => $folder->id
         ]);
     }
 
@@ -88,17 +88,17 @@ class TaskController extends Controller
      *  【タスク編集ページの表示機能】
      *  機能：タスクIDをフォルダ編集ページに渡して表示する
      *
-     *  GET /folders/{id}/tasks/{task_id}/edit
-     *  @param int $id
+     *  GET /folders/{folder}/tasks/{task_id}/edit
+     *  @param Folder $folder
      *  @param int $task_id
      *  @return \Illuminate\View\View
      */
 
-    public function showEditForm(int $id, int $task_id){
+    public function showEditForm(Folder $folder, int $task_id){
 
         /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
+        $folder = $user->folders()->findOrFail($folder->id);
 
         $task = $folder->tasks()->find($task_id);
 
@@ -111,21 +111,21 @@ class TaskController extends Controller
      *  【タスクの編集機能】
      *  機能：タスクが編集されたらDBを更新処理をしてタスク一覧にリダイレクトする
      *
-     *  POST /folders/{id}/tasks/{task_id}/edit
-     *  @param int $id
-     *  @param int $task_id
+     *  POST /folders/{folder}/tasks/{task}/edit
+     *  @param Folder $folder
+     *  @param Task $task
      *  @param EditTask $request
      *  @return \Illuminate\Http\RedirectResponse
      */
 
-    public function edit(int $id, int $task_id, EditTask $request)
+    public function edit(Folder $folder, Task $task, EditTask $request)
     {
 
         /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
+        $folder = $user->folders()->findOrFail($folder->id);
 
-        $task = $folder->tasks()->find($task_id);
+        $task = $folder->tasks()->find($task->id);
 
         $task->title = $request->title;
         $task->status = $request->status;
@@ -133,25 +133,25 @@ class TaskController extends Controller
         $task->save();
 
         return redirect()->route('tasks.index', [
-            'id' => $task->folder_id,
+            'folder' => $task->folder_id,
         ]);
     }
 
     /**
      *  【タスク削除ページの表示機能】
      *
-     *  GET /folders/{id}/tasks/{task_id}/delete
-     *  @param int $id
-     *  @param int $task_id
+     *  GET /folders/{folder}/tasks/{task}/delete
+     *  @param Folder $folder
+     *  @param Task $task
      *  @return \Illuminate\View\View
      */
-    public function showDeleteForm(int $id, int $task_id)
+    public function showDeleteForm(Folder $folder, Task $task)
     {
 
         /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
-        $task = $folder->tasks()->findOrFail($task_id);
+        $folder = $user->folders()->findOrFail($folder->id);
+        $task = $folder->tasks()->findOrFail($task->id);
 
         return view('tasks.delete', [
             'task' => $task,
@@ -162,23 +162,23 @@ class TaskController extends Controller
      *  【タスクの削除機能】
      *  機能：タスクが削除されたらDBから削除し、タスク一覧にリダイレクトする
      *
-     *  POST /folders/{id}/tasks/{task_id}/delete
-     *  @param int $id
-     *  @param int $task_id
+     *  POST /folders/{folder}/tasks/{task}/delete
+     *  @param Folder $folder
+     *  @param Task $task
      *  @return RedirectResponse
      */
-    public function delete(int $id, int $task_id)
+    public function delete(Folder $folder, Task $task)
     {
 
         /** @var App\Models\User **/
         $user = Auth::user();
-        $folder = $user->folders()->findOrFail($id);
-        $task = $folder->tasks()->findOrFail($task_id);
+        $folder = $user->folders()->findOrFail($folder->id);
+        $task = $folder->tasks()->findOrFail($task->id);
 
         $task->delete();
 
         return redirect()->route('tasks.index', [
-            'id' => $task->folder_id
+            'folder' => $folder->id
         ]);
     }
 }
