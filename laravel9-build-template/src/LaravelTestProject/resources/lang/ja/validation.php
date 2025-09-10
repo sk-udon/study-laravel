@@ -155,6 +155,9 @@ return [
 
     'attributes' => [
         'title' => 'フォルダ名',
+        'email' => 'メールアドレス',
+        'password' => 'パスワード',
+        'token' => 'トークン',
     ],
 
 ];
