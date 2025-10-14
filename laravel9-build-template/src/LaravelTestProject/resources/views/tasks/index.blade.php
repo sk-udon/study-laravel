@@ -44,13 +44,40 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="tag-filter-section" style="padding: 20px; border-bottom: 1px solid #ddd;">
+                            <form method="GET" action="{{ route('tasks.index', ['folder' => $folder_id]) }}" id="tag-filter-form">
+                                <h5>タグで絞り込み</h5>
+                                <div class="tag-filter-list">
+                                    <select name="tags" class="form-control"
+                                            onchange="document.getElementById('tag-filter-form').submit();">
+                                        <option value="">-- すべてのタスク --</option>
+                                        @foreach($tags as $tag)
+                                            <option value="{{ $tag->id }}"
+                                                    {{ !empty($selectedTagIds) && $selectedTagIds[0] == $tag->id ? 'selected' : '' }}>
+                                                {{ $tag->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="filter-controls" style="margin: 20px 0;">
+                                    <button type="button" id="clear-filter-btn" class="btn btn-sm btn-default">
+                                        フィルターをクリア
+                                    </button>
+                                    <span class="filter-status">
+                                        @if(empty($selectedTagIds))
+                                            全てのタスクを表示中
+                                        @endif
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>タイトル</th>
                                     <th>状態</th>
+                                    <th>タグ</th>
                                     <th>期限</th>
-                                    <th></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -60,6 +87,15 @@
                                     <td>{{ $task->title }}</td>
                                     <td>
                                         <span class="label {{ $task->status_class }}">{{ $task->status_label }}</span>
+                                    </td>
+                                    <td>
+                                        @if($task->tags->isNotEmpty())
+                                            <div class="task-tags">
+                                                @foreach($task->tags as $tag)
+                                                    <span class="task-tag">{{ $tag->name }}</span>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </td>
                                     <td>{{ $task->formatted_due_date }}</td>
                                     <td><a href="{{ route('tasks.edit', ['folder' => $task->folder_id, 'task' => $task->id]) }}">編集</a></td>
@@ -76,4 +112,12 @@
 
 @section('scripts')
   @include('share.flatpickr.scripts')
+
+  <script>
+      document.getElementById('clear-filter-btn').addEventListener('click', function() {
+          const select = document.querySelector('select[name="tags"]');
+          select.value = '';
+          document.getElementById('tag-filter-form').submit();
+      });
+    </script>
 @endsection

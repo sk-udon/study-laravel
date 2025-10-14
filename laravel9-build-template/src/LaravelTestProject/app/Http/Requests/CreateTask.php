@@ -26,6 +26,8 @@ class CreateTask extends FormRequest
         return [
             'title' => 'required|max:100',
             'due_date' => 'required|date|after_or_equal:today',
+            'tags' => 'nullable|array',
+            'tags.*' => 'integer|exists:tags,id',
         ];
     }
 
@@ -39,6 +41,7 @@ class CreateTask extends FormRequest
         return [
             'title' => 'タイトル',
             'due_date' => '期限日',
+            'tags' => 'タグ',
         ];
     }
 

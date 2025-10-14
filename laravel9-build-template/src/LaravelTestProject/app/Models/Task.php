@@ -13,7 +13,7 @@ class Task extends Model
 
     /**
      * ステータス（状態）定義
-     * 
+     *
      */
     const STATUS = [
         1 => ['label' => '未着手', 'class' => 'label-danger'],
@@ -23,7 +23,7 @@ class Task extends Model
 
     /**
      * ステータス（状態）ラベルのアクセサメソッド
-     * 
+     *
      * @return string
      */
 
@@ -41,7 +41,7 @@ class Task extends Model
 
     /**
      * ステータス（状態）クラスのアクセサメソッド
-     * 
+     *
      * @return string
      */
 
@@ -58,12 +58,17 @@ class Task extends Model
     }
     /**
      * 整形した期限日のアクセサメソッド
-     * 
+     *
      * @return string
      */
     public function getFormattedDueDateAttribute()
     {
         return Carbon::createFromFormat('Y-m-d', $this->attributes['due_date'])
             ->format('Y/m/d');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'tag_task');
     }
 }
